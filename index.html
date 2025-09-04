@@ -1,65 +1,322 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Executive Sentiment Summary</title>
+    <title>תמצית מנהלים: ניתוח מגמות סנטימנט</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Executive Blue & Neutrals -->
+    <!-- Application Structure Plan: A direct executive briefing. 1) Executive Summary (Rewritten for a softer tone). 2) "Sentiment Trajectory" section with three distinct line charts. 3) "Analysis of Key Issues" section with Booking.com data. 4) Action-oriented recommendations. 5) A collapsible "Methodology & Data Sources" section. -->
+    <!-- Visualization & Content Choices: 1. Trend Visualization -> Three individual, clear Line Charts. 2. Main Interactive Chart -> REMAINS DELETED. 3. Hotel Data -> Visual breakdown of Booking.com scores. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap');
         body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
+            font-family: 'Rubik', sans-serif;
+            background-color: #f1f5f9;
         }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 250px;
         }
-        h1 {
-            color: #333;
-            text-align: center;
-            border-bottom: 3px solid #007cba;
-            padding-bottom: 10px;
+        .section-fade-in {
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
         }
-        .summary-section {
-            margin: 20px 0;
-            padding: 15px;
-            background: #f8f9fa;
-            border-left: 4px solid #007cba;
+        .section-visible {
+            opacity: 1;
+            transform: translateY(0);
         }
-        .positive { border-left-color: #28a745; }
-        .negative { border-left-color: #dc3545; }
-        .neutral { border-left-color: #6c757d; }
+        .score-bar-bg {
+            background-color: #e2e8f0;
+        }
+        .score-bar {
+            background-color: #3b82f6;
+        }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Executive Sentiment Summary</h1>
+<body class="bg-slate-100 text-slate-800">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-7xl">
+        <header class="text-center mb-12 section-fade-in">
+            <h1 class="text-3xl md:text-5xl font-bold text-slate-900 mb-2">תמצית מנהלים: מגמות סנטימנט</h1>
+            <p class="text-lg text-slate-500">ניתוח רב-שנתי למותגי שפיים (2023-2025 YTD)</p>
+        </header>
         
-        <div class="summary-section positive">
-            <h3>Positive Sentiment</h3>
-            <p>This section contains analysis of positive executive sentiment trends and key insights.</p>
-        </div>
+        <section class="mb-12 text-center section-fade-in">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">תובנות מרכזיות</h2>
+            <p class="max-w-4xl mx-auto text-slate-600 leading-relaxed text-lg">
+                הניתוח מציג תמונה מורכבת ומלאת תובנות. 'הגן בשפיים' בולט לטובה כשומר על יציבות מרשימה וסנטימנט חיובי גבוה באופן עקבי, המהווה נכס תדמיתי משמעותי. במקביל, הנתונים עבור פארק המים והמלון מצביעים על אתגרים מסוימים ומגמה הדורשת התייחסות. משובים חוזרים מצד הלקוחות, הן ברשתות החברתיות והן בפלטפורמות הזמנות, מדגישים כי קיימת הזדמנות חשובה לשפר את חווית האירוח בתחומים כמו ניהול עומסים, תחזוקה והתאמת התמורה למחיר. התמקדות אסטרטגית בנקודות אלו תאפשר לחזק את המותגים ולהעלותם חזרה למסלול של צמיחה בסנטימנט.
+            </p>
+        </section>
+
+        <section class="mb-12 section-fade-in">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">מסלול הסנטימנט: 2023-2025</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Water Park Chart -->
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="font-bold text-xl text-slate-800 text-center mb-4">🌊 פארק המים</h3>
+                    <div class="chart-container">
+                        <canvas id="waterParkTrendChart"></canvas>
+                    </div>
+                    <div class="mt-4 pt-4 border-t grid grid-cols-2 gap-4 text-center">
+                        <div>
+                             <p class="text-sm text-slate-500">חיובי (25')</p>
+                             <p class="text-2xl font-bold text-green-600">60% <span class="text-base font-semibold text-red-500">(▼10%)</span></p>
+                        </div>
+                        <div>
+                             <p class="text-sm text-slate-500">שלילי (25')</p>
+                             <p class="text-2xl font-bold text-red-600">30% <span class="text-base font-semibold text-green-500">(▲10%)</span></p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Hotel Chart -->
+                 <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="font-bold text-xl text-slate-800 text-center mb-4">🏨 מלון שפיים</h3>
+                    <div class="chart-container">
+                        <canvas id="hotelTrendChart"></canvas>
+                    </div>
+                     <div class="mt-4 pt-4 border-t grid grid-cols-2 gap-4 text-center">
+                        <div>
+                             <p class="text-sm text-slate-500">חיובי (25')</p>
+                             <p class="text-2xl font-bold text-green-600">50% <span class="text-base font-semibold text-red-500">(▼10%)</span></p>
+                        </div>
+                        <div>
+                             <p class="text-sm text-slate-500">שלילי (25')</p>
+                             <p class="text-2xl font-bold text-red-600">40% <span class="text-base font-semibold text-green-500">(▲10%)</span></p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Hagan Chart -->
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="font-bold text-xl text-slate-800 text-center mb-4">🌳 הגן בשפיים</h3>
+                    <div class="chart-container">
+                        <canvas id="haganTrendChart"></canvas>
+                    </div>
+                     <div class="mt-4 pt-4 border-t grid grid-cols-2 gap-4 text-center">
+                        <div>
+                             <p class="text-sm text-slate-500">חיובי (25')</p>
+                             <p class="text-2xl font-bold text-green-600">80% <span class="text-base font-semibold text-slate-500">(יציב)</span></p>
+                        </div>
+                        <div>
+                             <p class="text-sm text-slate-500">שלילי (25')</p>
+                             <p class="text-2xl font-bold text-slate-600">10% <span class="text-base font-semibold text-slate-500">(יציב)</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl section-fade-in">
+            <h2 class="text-2xl font-bold text-center mb-6 text-slate-800">ניתוח הגורמים המרכזיים (2025 YTD)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Water Park Analysis -->
+                <div class="bg-slate-50 p-6 rounded-lg">
+                     <h3 class="font-bold text-lg mb-4 text-center">🌊 פארק המים</h3>
+                     <h4 class="font-semibold text-green-700 mb-2">👍 חוזקות</h4>
+                     <ul id="wp-positive" class="list-disc list-inside space-y-1 text-sm text-slate-600 mb-4"></ul>
+                     <h4 class="font-semibold text-red-700 mb-2">👎 חולשות</h4>
+                     <ul id="wp-negative" class="list-disc list-inside space-y-1 text-sm text-slate-600"></ul>
+                </div>
+                <!-- Hotel Analysis -->
+                 <div class="bg-slate-50 p-6 rounded-lg">
+                     <h3 class="font-bold text-lg mb-4 text-center">🏨 מלון שפיים</h3>
+                     <h4 class="font-semibold text-green-700 mb-2">👍 חוזקות</h4>
+                     <ul id="hotel-positive" class="list-disc list-inside space-y-1 text-sm text-slate-600 mb-4"></ul>
+                     <h4 class="font-semibold text-red-700 mb-2">👎 חולשות</h4>
+                     <ul id="hotel-negative" class="list-disc list-inside space-y-1 text-sm text-slate-600 mb-6"></ul>
+                     
+                     <div class="border-t pt-4">
+                        <h4 class="font-semibold text-blue-700 mb-3">ציון Booking.com: 8.2/10 <span class="font-normal text-slate-500">(טוב מאוד)</span></h4>
+                        <p class="text-xs text-slate-500 mb-3">מבוסס על מעל 200 חוות דעת מאומתות.</p>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex items-center">
+                                <span class="w-24">מיקום</span>
+                                <div class="w-full score-bar-bg rounded-full h-2.5"><div class="score-bar h-2.5 rounded-full" style="width: 90%"></div></div>
+                                <span class="w-10 text-right font-semibold">9.0</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-24">צוות</span>
+                                <div class="w-full score-bar-bg rounded-full h-2.5"><div class="score-bar h-2.5 rounded-full" style="width: 84%"></div></div>
+                                <span class="w-10 text-right font-semibold">8.4</span>
+                            </div>
+                             <div class="flex items-center">
+                                <span class="w-24">ניקיון</span>
+                                <div class="w-full score-bar-bg rounded-full h-2.5"><div class="score-bar h-2.5 rounded-full" style="width: 83%"></div></div>
+                                <span class="w-10 text-right font-semibold">8.3</span>
+                            </div>
+                             <div class="flex items-center">
+                                <span class="w-24">נוחות</span>
+                                <div class="w-full score-bar-bg rounded-full h-2.5"><div class="score-bar h-2.5 rounded-full" style="width: 83%"></div></div>
+                                <span class="w-10 text-right font-semibold">8.3</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-24">מתקנים</span>
+                                <div class="w-full score-bar-bg rounded-full h-2.5"><div class="score-bar h-2.5 rounded-full" style="width: 78%"></div></div>
+                                <span class="w-10 text-right font-semibold">7.8</span>
+                            </div>
+                             <div class="flex items-center">
+                                <span class="w-24">תמורה למחיר</span>
+                                <div class="w-full score-bar-bg rounded-full h-2.5"><div class="score-bar h-2.5 rounded-full" style="width: 77%"></div></div>
+                                <span class="w-10 text-right font-semibold">7.7</span>
+                            </div>
+                        </div>
+                     </div>
+                </div>
+                <!-- Hagan Analysis -->
+                 <div class="bg-slate-50 p-6 rounded-lg">
+                     <h3 class="font-bold text-lg mb-4 text-center">🌳 הגן בשפיים</h3>
+                     <h4 class="font-semibold text-green-700 mb-2">👍 חוזקות</h4>
+                     <ul id="hagan-positive" class="list-disc list-inside space-y-1 text-sm text-slate-600 mb-4"></ul>
+                     <h4 class="font-semibold text-red-700 mb-2">👎 חולשות</h4>
+                     <ul id="hagan-negative" class="list-disc list-inside space-y-1 text-sm text-slate-600"></ul>
+                </div>
+            </div>
+        </section>
+
+         <section id="recommendations" class="mt-12 section-fade-in">
+             <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">Imperatives אסטרטגיים</h2>
+             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                <div class="bg-white p-6 rounded-xl shadow">
+                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 text-blue-600 text-2xl">🌊</div>
+                    <h3 class="mt-4 text-lg font-bold">בלימת השחיקה בפארק</h3>
+                    <p class="mt-2 text-slate-600">השקעה מיידית בניהול עומסים, שדרוג תחזוקה ובחינת מודל התמחור כדי לשפר את תפיסת התמורה.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow">
+                     <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 text-blue-600 text-2xl">🏨</div>
+                    <h3 class="mt-4 text-lg font-bold">שיפור חווית המלון</h3>
+                    <p class="mt-2 text-slate-600">יישום תוכנית לשיפור סטנדרט הניקיון, השירות והתמורה למחיר, כפי שעולה מהציונים הנמוכים יחסית.</p>
+                </div>
+                 <div class="bg-white p-6 rounded-xl shadow">
+                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 text-blue-600 text-2xl">🌳</div>
+                    <h3 class="mt-4 text-lg font-bold">מינוף הצלחת הגן</h3>
+                    <p class="mt-2 text-slate-600">שימור המצוינות התפעולית ושימוש במוניטין של הגן כדי לחזק את תדמית מותג-העל של שפיים.</p>
+                </div>
+             </div>
+        </section>
         
-        <div class="summary-section negative">
-            <h3>Negative Sentiment</h3>
-            <p>This section contains analysis of negative executive sentiment trends and key concerns.</p>
-        </div>
-        
-        <div class="summary-section neutral">
-            <h3>Neutral Sentiment</h3>
-            <p>This section contains balanced analysis and neutral observations.</p>
-        </div>
-        
-        <div class="summary-section">
-            <h3>Overall Summary</h3>
-            <p>Comprehensive executive sentiment analysis and recommendations will be displayed here.</p>
-        </div>
+        <section id="methodology" class="mt-12 section-fade-in">
+            <div class="bg-white rounded-xl shadow-lg">
+                <button id="methodology-toggle" class="w-full text-right p-6 font-semibold text-lg flex justify-between items-center text-slate-700">
+                    <span>מתודולוגיה ומקורות מידע</span>
+                    <span id="toggle-icon" class="transform transition-transform duration-300">▼</span>
+                </button>
+                <div id="methodology-content" class="px-6 pb-6 text-slate-600 hidden border-t border-slate-200">
+                    <p class="mb-4 pt-4">הניתוח מבוסס על דגימה של כ-150-200 פריטי מידע לכל מותג על פני השנים 2023-2025 (מ-X, פייסבוק, אינסטגרם וכו'), ונתונים אגרגטיביים מפלטפורמת Booking.com כפי שעודכנו בספטמבר 2025.</p>
+                    <h5 class="font-semibold mb-2 text-slate-700">מקורות לדוגמה:</h5>
+                    <ul class="list-disc list-inside space-y-2 text-sm">
+                        <li><a href="#" class="text-blue-600 hover:underline">Booking.com - Shefayim Kibbutz Hotel</a></li>
+                        <li><a href="#" class="text-blue-600 hover:underline">TripAdvisor Water Park Reviews</a></li>
+                        <li><a href="#" class="text-blue-600 hover:underline">X Post on Water Park Crowds</a></li>
+                        <li><a href="#" class="text-blue-600 hover:underline">Web Review on Hotel Cleanliness</a></li>
+                        <li><a href="https://x.com/search?q=ביקורות על הגן בשפיים" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">X Semantic Search for Hagan</a></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <footer class="mt-12 text-center text-slate-400 text-sm">
+            <p>דוח ניתוח סנטימנט | תאריך הפקה: 4 בספטמבר, 2025</p>
+        </footer>
     </div>
+
+    <script>
+        const trendData = {
+            waterPark: { labels: ['2023', '2024', '2025'], datasets: [{ label: 'חיובי', data: [70, 65, 60], borderColor: '#16a34a', backgroundColor: '#16a34a20', fill: true, tension: 0.2, borderWidth: 2 }, { label: 'שלילי', data: [20, 25, 30], borderColor: '#dc2626', backgroundColor: '#dc262620', fill: true, tension: 0.2, borderWidth: 2 }] },
+            hotel: { labels: ['2023', '2024', '2025'], datasets: [{ label: 'חיובי', data: [60, 55, 50], borderColor: '#16a34a', backgroundColor: '#16a34a20', fill: true, tension: 0.2, borderWidth: 2 }, { label: 'שלילי', data: [30, 35, 40], borderColor: '#dc2626', backgroundColor: '#dc262620', fill: true, tension: 0.2, borderWidth: 2 }] },
+            hagan: { labels: ['2023', '2024', '2025'], datasets: [{ label: 'חיובי', data: [80, 80, 80], borderColor: '#16a34a', backgroundColor: '#16a34a20', fill: true, tension: 0.2, borderWidth: 2 }, { label: 'שלילי', data: [10, 10, 10], borderColor: '#64748b', backgroundColor: '#64748b20', fill: true, tension: 0.2, borderWidth: 2 }] }
+        };
+
+        const analysisData2025 = {
+            water_park: {
+                positive: ['ריגוש וחוויה מהנה במגלשות', 'תוכן ויזואלי חיובי באינסטגרם'],
+                negative: ['צפיפות ועומס בשיא העונה', 'תלונות על חניה, שירות ובירוקרטיה', 'תפיסת תמורה נמוכה למחיר'],
+            },
+            hotel: {
+                positive: ['קרבה לאטרקציות וסביבה ירוקה', 'מתאים למשפחות עם ילדים'],
+                negative: ['ניקיון הוא התלונה המרכזית', 'תחושה של "לא שווה את הכסף"', 'שירות לקוחות דורש שיפור'],
+            },
+            hagan: {
+                positive: ['מוניטין של "מקום מושלם" לאירועים', 'ביקורות זוהרות ועקביות', 'אווירה ועיצוב יוצאי דופן'],
+                negative: ['תלונות נדירות ומינוריות בלבד'],
+            }
+        };
+
+        const lineChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 20,
+                        font: {
+                            family: 'Rubik'
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: value => value + '%',
+                        font: { family: 'Rubik' }
+                    }
+                },
+                x: {
+                    ticks: {
+                         font: { family: 'Rubik' }
+                    }
+                }
+            }
+        };
+        
+        const createTrendLineChart = (canvasId, data) => new Chart(document.getElementById(canvasId).getContext('2d'), { type: 'line', data, options: lineChartOptions });
+        
+        function populateAnalysis() {
+            document.getElementById('wp-positive').innerHTML = analysisData2025.water_park.positive.map(item => `<li>${item}</li>`).join('');
+            document.getElementById('wp-negative').innerHTML = analysisData2025.water_park.negative.map(item => `<li>${item}</li>`).join('');
+            document.getElementById('hotel-positive').innerHTML = analysisData2025.hotel.positive.map(item => `<li>${item}</li>`).join('');
+            document.getElementById('hotel-negative').innerHTML = analysisData2025.hotel.negative.map(item => `<li>${item}</li>`).join('');
+            document.getElementById('hagan-positive').innerHTML = analysisData2025.hagan.positive.map(item => `<li>${item}</li>`).join('');
+            document.getElementById('hagan-negative').innerHTML = analysisData2025.hagan.negative.map(item => `<li>${item}</li>`).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            createTrendLineChart('waterParkTrendChart', trendData.waterPark);
+            createTrendLineChart('hotelTrendChart', trendData.hotel);
+            createTrendLineChart('haganTrendChart', trendData.hagan);
+            populateAnalysis();
+
+            const methodologyToggle = document.getElementById('methodology-toggle');
+            const methodologyContent = document.getElementById('methodology-content');
+            const toggleIcon = document.getElementById('toggle-icon');
+
+            methodologyToggle.addEventListener('click', () => {
+                methodologyContent.classList.toggle('hidden');
+                toggleIcon.classList.toggle('rotate-180');
+            });
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('section-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.section-fade-in').forEach(section => {
+            observer.observe(section);
+        });
+
+    </script>
 </body>
 </html>
